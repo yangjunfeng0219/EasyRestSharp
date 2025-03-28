@@ -4,11 +4,11 @@
     <TargetFrameworks>net6.0;net452</TargetFrameworks>
     <LangVersion>13</LangVersion>
 	  <Nullable>enable</Nullable>
-	  <Version>0.9.1</Version>
+	  <Version>0.9.3</Version>
 	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	  <Title>EasyRestSharp - RESTful or Rest Web API client library</Title>
 	  <Authors>Yang Junfeng</Authors>
-	  <Description>An easy-to-use RESTful or Rest Web API client library</Description>
+	  <Description>An easy-to-use RESTful or Rest Web API client library based on RestSharp</Description>
 	  <PackageProjectUrl>https://github.com/yangjunfeng0219/EasyRestSharp</PackageProjectUrl>
 	  <RepositoryUrl>https://github.com/yangjunfeng0219/EasyRestSharp</RepositoryUrl>
 	  <PackageId>EasyRestSharp</PackageId>

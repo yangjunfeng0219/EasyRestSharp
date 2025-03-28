@@ -1,6 +1,7 @@
 ﻿namespace EasyRestSharp;
 
 using RestSharp;
+using RestSharp.Authenticators;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,163 +34,187 @@ public class Rest
 
     public string? BaseUrl => baseUrl;
     public RestClient Client => client;
-    public IRestAuthorization? Authorization { get; set; }
+    public IAuthenticator? Authenticator { get; set; }
 
     //如果需要返回可空类型，直接给T传可空类型即可
-    public Task<T> GetAsync<T>(string url, object? queryParams = null, object? headers = null)
+    public Task<T> GetAsync<T>(string url, object? queryParams = null,
+        object? headers = null, IAuthenticator? authenticator = null)
     {
-        return ExecuteWithoutBodyAsync<T>(RestMethod.Get, RestUrl.ApplyQueryParameters(url, queryParams), headers);
+        return ExecuteWithoutBodyAsync<T>(RestMethod.Get, RestUrl.ApplyQueryParameters(url, queryParams), headers, authenticator);
     }
 
-    public Task<RestResponse> GetAsync(string url, object? queryParams = null, object? headers = null)
+    public Task<RestResponse> GetAsync(string url, object? queryParams = null, 
+        object? headers = null, IAuthenticator? authenticator = null)
     {
-        return ExecuteWithoutBodyAsync(RestMethod.Get, RestUrl.ApplyQueryParameters(url, queryParams), headers);
+        return ExecuteWithoutBodyAsync(RestMethod.Get, RestUrl.ApplyQueryParameters(url, queryParams), headers, authenticator);
     }
 
-    public Task<T> PostAsync<T>(string url, object? body, object? headers = null)
+    public Task<T> PostAsync<T>(string url, object? body,
+        object? headers = null, IAuthenticator? authenticator = null)
     {
-        return ExecuteAsync<T>(RestMethod.Post, url, body, headers);
+        return ExecuteAsync<T>(RestMethod.Post, url, body, headers, authenticator);
     }
 
-    public Task<RestResponse> PostAsync(string url, object? body, object? headers = null)
+    public Task<RestResponse> PostAsync(string url, object? body,
+        object? headers = null, IAuthenticator? authenticator = null)
     {
-        return ExecuteAsync(RestMethod.Post, url, body, headers);
+        return ExecuteAsync(RestMethod.Post, url, body, headers, authenticator);
     }
 
-    public Task<T> PostMultipartAsync<T>(string url, MultipartData multipart, object? headers = null)
+    public Task<T> PostMultipartAsync<T>(string url, MultipartData multipart,
+        object? headers = null, IAuthenticator? authenticator = null)
     {
-        return ExecuteWithMultipartAsync<T>(RestMethod.Post, url, multipart, headers);
+        return ExecuteWithMultipartAsync<T>(RestMethod.Post, url, multipart, headers, authenticator);
     }
 
-    public Task<RestResponse> PostMultipartAsync(string url, MultipartData multipart, object? headers = null)
+    public Task<RestResponse> PostMultipartAsync(string url, MultipartData multipart,
+        object? headers = null, IAuthenticator? authenticator = null)
     {
-        return ExecuteWithMultipartAsync(RestMethod.Post, url, multipart, headers);
+        return ExecuteWithMultipartAsync(RestMethod.Post, url, multipart, headers, authenticator);
     }
 
-    public Task<T> PostStringAsync<T>(string url, string body, string contentType = RestContentTypes.PlainText, object? headers = null)
+    public Task<T> PostStringAsync<T>(string url, string body, string contentType = RestContentTypes.PlainText,
+        object? headers = null, IAuthenticator? authenticator = null)
     {
-        return ExecuteWithStringAsync<T>(RestMethod.Post, url, body, contentType, headers);
+        return ExecuteWithStringAsync<T>(RestMethod.Post, url, body, contentType, headers, authenticator);
     }
 
-    public Task<RestResponse> PostStringAsync(string url, string body, string contentType = RestContentTypes.PlainText, object? headers = null)
+    public Task<RestResponse> PostStringAsync(string url, string body, string contentType = RestContentTypes.PlainText,
+        object? headers = null, IAuthenticator? authenticator = null)
     {
-        return ExecuteWithStringAsync(RestMethod.Post, url, body, contentType, headers);
+        return ExecuteWithStringAsync(RestMethod.Post, url, body, contentType, headers, authenticator);
     }
 
-    public Task<T> PutAsync<T>(string url, object? body, object? headers = null)
+    public Task<T> PutAsync<T>(string url, object? body,
+        object? headers = null, IAuthenticator? authenticator = null)
     {
-        return ExecuteAsync<T>(RestMethod.Put, url, body, headers);
+        return ExecuteAsync<T>(RestMethod.Put, url, body, headers, authenticator);
     }
 
-    public Task<RestResponse> PutAsync(string url, object? body, object? headers = null)
+    public Task<RestResponse> PutAsync(string url, object? body, 
+        object? headers = null, IAuthenticator? authenticator = null)
     {
-        return ExecuteAsync(RestMethod.Put, url, body, headers);
+        return ExecuteAsync(RestMethod.Put, url, body, headers, authenticator);
     }
 
-    public Task<T> PatchAsync<T>(string url, object? body, object? headers = null)
+    public Task<T> PatchAsync<T>(string url, object? body, 
+        object? headers = null, IAuthenticator? authenticator = null)
     {
-        return ExecuteAsync<T>(RestMethod.Patch, url, body, headers);
+        return ExecuteAsync<T>(RestMethod.Patch, url, body, headers, authenticator);
     }
 
-    public Task<RestResponse> PatchAsync(string url, object? body, object? headers = null)
+    public Task<RestResponse> PatchAsync(string url, object? body, 
+        object? headers = null, IAuthenticator? authenticator = null)
     {
-        return ExecuteAsync(RestMethod.Patch, url, body, headers);
+        return ExecuteAsync(RestMethod.Patch, url, body, headers, authenticator);
     }
 
-    public Task<T> DeleteAsync<T>(string url, object? queryParams = null, object? headers = null)
+    public Task<T> DeleteAsync<T>(string url, object? queryParams = null, 
+        object? headers = null, IAuthenticator? authenticator = null)
     {
-        return ExecuteWithoutBodyAsync<T>(RestMethod.Delete, RestUrl.ApplyQueryParameters(url, queryParams), headers);
+        return ExecuteWithoutBodyAsync<T>(RestMethod.Delete, RestUrl.ApplyQueryParameters(url, queryParams), headers, authenticator);
     }
 
-    public Task<RestResponse> DeleteAsync(string url, object? queryParams = null, object? headers = null)
+    public Task<RestResponse> DeleteAsync(string url, object? queryParams = null, 
+        object? headers = null, IAuthenticator? authenticator = null)
     {
-        return ExecuteAsync(RestMethod.Delete, RestUrl.ApplyQueryParameters(url, queryParams), headers);
+        return ExecuteAsync(RestMethod.Delete, RestUrl.ApplyQueryParameters(url, queryParams), headers, authenticator);
     }
 
-    public Task<T> OptionsAsync<T>(string url, object? queryParams = null, object? headers = null)
+    public Task<T> OptionsAsync<T>(string url, object? queryParams = null,
+        object? headers = null, IAuthenticator? authenticator = null)
     {
-        return ExecuteAsync<T>(RestMethod.Options, RestUrl.ApplyQueryParameters(url, queryParams), headers);
+        return ExecuteAsync<T>(RestMethod.Options, RestUrl.ApplyQueryParameters(url, queryParams), headers, authenticator);
     }
 
-    public Task<RestResponse> OptionsAsync(string url, object? queryParams = null, object? headers = null)
+    public Task<RestResponse> OptionsAsync(string url, object? queryParams = null, 
+        object? headers = null, IAuthenticator? authenticator = null)
     {
-        return ExecuteAsync(RestMethod.Options, RestUrl.ApplyQueryParameters(url, queryParams), headers);
+        return ExecuteAsync(RestMethod.Options, RestUrl.ApplyQueryParameters(url, queryParams), headers, authenticator);
     }
 
-    public Task<T> ExecuteAsync<T>(RestMethod method, string url, object? body = null, object? headers = null)
+    public Task<T> ExecuteAsync<T>(RestMethod method, string url, object? body = null, 
+        object? headers = null, IAuthenticator? authenticator = null)
     {
         var request = new RestRequest(url, ToNativeMethod(method));
         AddHeaders(request, headers);
         AddJsonBody(request, body);
-        Authorization?.Authorize(request);
+        (authenticator ?? Authenticator)?.Authenticate(client, request);
 
         return NativeExecuteAsync<T>(request);
     }
 
-    public Task<RestResponse> ExecuteAsync(RestMethod method, string url, object? body = null, object? headers = null)
+    public Task<RestResponse> ExecuteAsync(RestMethod method, string url, object? body = null,
+        object? headers = null, IAuthenticator? authenticator = null)
     {
         var request = new RestRequest(url, ToNativeMethod(method));
         AddHeaders(request, headers);
         AddJsonBody(request, body);
-        Authorization?.Authorize(request);
+        (authenticator ?? Authenticator)?.Authenticate(client, request);
 
         return NativeExecuteAsync(request);
     }
 
-    public Task<T> ExecuteWithMultipartAsync<T>(RestMethod method, string url, MultipartData? multipart = null, object? headers = null)
+    public Task<T> ExecuteWithMultipartAsync<T>(RestMethod method, string url, MultipartData? multipart = null,
+        object? headers = null, IAuthenticator? authenticator = null)
     {
         var request = new RestRequest(url, ToNativeMethod(method));
         AddHeaders(request, headers);
         AddMultipartBody(request, multipart);
-        Authorization?.Authorize(request);
+        (authenticator ?? Authenticator)?.Authenticate(client, request);
 
         return NativeExecuteAsync<T>(request);
     }
 
-    public Task<RestResponse> ExecuteWithMultipartAsync(RestMethod method, string url, MultipartData? multipart = null, object? headers = null)
+    public Task<RestResponse> ExecuteWithMultipartAsync(RestMethod method, string url, MultipartData? multipart = null,
+        object? headers = null, IAuthenticator? authenticator = null)
     {
         var request = new RestRequest(url, ToNativeMethod(method));
         AddHeaders(request, headers);
         AddMultipartBody(request, multipart);
-        Authorization?.Authorize(request);
+        (authenticator ?? Authenticator)?.Authenticate(client, request);
 
         return NativeExecuteAsync(request);
     }
 
-    public Task<T> ExecuteWithStringAsync<T>(RestMethod method, string url, string? body = null, string contentType = RestContentTypes.PlainText, object? headers = null)
+    public Task<T> ExecuteWithStringAsync<T>(RestMethod method, string url, string? body = null, string contentType = RestContentTypes.PlainText,
+        object? headers = null, IAuthenticator? authenticator = null)
     {
         var request = new RestRequest(url, ToNativeMethod(method));
         AddHeaders(request, headers);
         AddStringBody(request, body ?? string.Empty, contentType);
-        Authorization?.Authorize(request);
+        (authenticator ?? Authenticator)?.Authenticate(client, request);
 
         return NativeExecuteAsync<T>(request);
     }
 
-    public Task<RestResponse> ExecuteWithStringAsync(RestMethod method, string url, string? body = null, string contentType = RestContentTypes.PlainText, object? headers = null)
+    public Task<RestResponse> ExecuteWithStringAsync(RestMethod method, string url, string? body = null, string contentType = RestContentTypes.PlainText,
+        object? headers = null, IAuthenticator? authenticator = null)
     {
         var request = new RestRequest(url, ToNativeMethod(method));
         AddHeaders(request, headers);
         AddStringBody(request, body ?? string.Empty, contentType);
-        Authorization?.Authorize(request);
+        (authenticator ?? Authenticator)?.Authenticate(client, request);
 
         return NativeExecuteAsync(request);
     }
 
-    public Task<T> ExecuteWithoutBodyAsync<T>(RestMethod method, string url, object? headers = null)
+    public Task<T> ExecuteWithoutBodyAsync<T>(RestMethod method, string url,
+        object? headers = null, IAuthenticator? authenticator = null)
     {
         var request = new RestRequest(url, ToNativeMethod(method));
         AddHeaders(request, headers);
-        Authorization?.Authorize(request);
+        (authenticator ?? Authenticator)?.Authenticate(client, request);
 
         return NativeExecuteAsync<T>(request);
     }
 
-    public Task<RestResponse> ExecuteWithoutBodyAsync(RestMethod method, string url, object? headers = null)
+    public Task<RestResponse> ExecuteWithoutBodyAsync(RestMethod method, string url,
+        object? headers = null, IAuthenticator? authenticator = null)
     {
         var request = new RestRequest(url, ToNativeMethod(method));
         AddHeaders(request, headers);
-        Authorization?.Authorize(request);
+        (authenticator ?? Authenticator)?.Authenticate(client, request);
 
         return NativeExecuteAsync(request);
     }
@@ -273,7 +298,7 @@ public class Rest
 
         var props = RestUtils.GetNameValues(headers);
         foreach (var nameValue in props) {
-            if (nameValue.Value == null) throw new Exception("Header value is not permit to be null");
+            if (nameValue.Value == null) throw new Exception("Header value is not permitted to be null");
 
 #if NETCOREAPP
             var p = new HeaderParameter(nameValue.Name, nameValue.Value, false);

@@ -9,5 +9,5 @@ using System.Threading.Tasks;
 
 public interface IRestAuthorization
 {
-    void Authorize(RestRequest request);
+    void Authorize(RestClient client, RestRequest request);
 }
