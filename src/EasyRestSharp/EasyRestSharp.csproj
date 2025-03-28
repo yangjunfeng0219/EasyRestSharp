@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net452</TargetFrameworks>
+    <LangVersion>13</LangVersion>
+	  <Nullable>enable</Nullable>
+	  <Version>0.9.1</Version>
+	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	  <Title>EasyRestSharp - RESTful or Rest Web API client library</Title>
+	  <Authors>Yang Junfeng</Authors>
+	  <Description>An easy-to-use RESTful or Rest Web API client library</Description>
+	  <PackageProjectUrl>https://github.com/yangjunfeng0219/EasyRestSharp</PackageProjectUrl>
+	  <RepositoryUrl>https://github.com/yangjunfeng0219/EasyRestSharp</RepositoryUrl>
+	  <PackageId>EasyRestSharp</PackageId>
+	  <Copyright>Copyright © Yang Junfeng 2025-2025</Copyright>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
+    <WarningLevel>8</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0|AnyCPU'">
+    <WarningLevel>8</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net452|AnyCPU'">
+    <WarningLevel>8</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net452|AnyCPU'">
+    <WarningLevel>8</WarningLevel>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+    <PackageReference Include="PolySharp" Version="1.15.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="RestSharp" Version="106.15.0" />
+  </ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' != 'net452' ">
+		<PackageReference Include="PolySharp" Version="1.15.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="RestSharp" Version="112.1.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+</Project>
