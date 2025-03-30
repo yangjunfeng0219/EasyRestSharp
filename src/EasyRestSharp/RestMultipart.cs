@@ -27,7 +27,7 @@ public struct StringPart : IRestPart
     }
     public string Name { get; private set; }
     public string? Value { get; private set; }
-    public string? ContentType => "text/plain";
+    public string? ContentType => RestContentTypes.PlainText;
 }
 
 public struct ByteArrayPart : IRestFilePart
@@ -69,7 +69,7 @@ public struct FilePart : IRestFilePart
         Name = name;
         FilePath = filePath;
         FileName = fileName;
-        ContentType = contentType;
+        ContentType = contentType ?? RestContentTypes.OctetStream;
     }
 
     public string Name { get; private set; }

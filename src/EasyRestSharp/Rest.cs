@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-#if NETCOREAPP
+#if NET6_0_OR_GREATER
 public class Rest : IDisposable
 #else
 public class Rest
@@ -155,7 +155,7 @@ public class Rest
         return NativeExecuteAsync(request);
     }
 
-    public Task<T> ExecuteWithMultipartAsync<T>(RestMethod method, string url, MultipartData? multipart = null,
+    public Task<T> ExecuteWithMultipartAsync<T>(RestMethod method, string url, MultipartData multipart,
         object? headers = null, IAuthenticator? authenticator = null)
     {
         var request = new RestRequest(url, ToNativeMethod(method));
@@ -166,7 +166,7 @@ public class Rest
         return NativeExecuteAsync<T>(request);
     }
 
-    public Task<RestResponse> ExecuteWithMultipartAsync(RestMethod method, string url, MultipartData? multipart = null,
+    public Task<RestResponse> ExecuteWithMultipartAsync(RestMethod method, string url, MultipartData multipart,
         object? headers = null, IAuthenticator? authenticator = null)
     {
         var request = new RestRequest(url, ToNativeMethod(method));
@@ -177,7 +177,7 @@ public class Rest
         return NativeExecuteAsync(request);
     }
 
-    public Task<T> ExecuteWithStringAsync<T>(RestMethod method, string url, string? body = null, string contentType = RestContentTypes.PlainText,
+    public Task<T> ExecuteWithStringAsync<T>(RestMethod method, string url, string body, string contentType = RestContentTypes.PlainText,
         object? headers = null, IAuthenticator? authenticator = null)
     {
         var request = new RestRequest(url, ToNativeMethod(method));
@@ -188,7 +188,7 @@ public class Rest
         return NativeExecuteAsync<T>(request);
     }
 
-    public Task<RestResponse> ExecuteWithStringAsync(RestMethod method, string url, string? body = null, string contentType = RestContentTypes.PlainText,
+    public Task<RestResponse> ExecuteWithStringAsync(RestMethod method, string url, string body, string contentType = RestContentTypes.PlainText,
         object? headers = null, IAuthenticator? authenticator = null)
     {
         var request = new RestRequest(url, ToNativeMethod(method));
@@ -219,7 +219,7 @@ public class Rest
         return NativeExecuteAsync(request);
     }
 
-#if NETCOREAPP
+#if NET6_0_OR_GREATER
     public static void ThrowIfError(RestResponse response)
 #else
     public static void ThrowIfError(IRestResponse response)
@@ -244,7 +244,7 @@ public class Rest
 
     private Method ToNativeMethod(RestMethod rm)
     {
-#if NETCOREAPP
+#if NET6_0_OR_GREATER
         return rm switch {
             RestMethod.Get => Method.Get,
             RestMethod.Post => Method.Post,
@@ -269,7 +269,7 @@ public class Rest
 
     private async Task<T> NativeExecuteAsync<T>(RestRequest request, CancellationToken token = default)
     {
-#if NETCOREAPP
+#if NET6_0_OR_GREATER
         var response = await client.ExecuteAsync<T>(request).ConfigureAwait(false);
         ThrowIfError(response);
         return response.Data!;
@@ -283,7 +283,7 @@ public class Rest
 
     private async Task<RestResponse> NativeExecuteAsync(RestRequest request, CancellationToken token = default)
     {
-#if NETCOREAPP
+#if NET6_0_OR_GREATER
         return await client.ExecuteAsync(request, token).ConfigureAwait(false);
 #else
         var response = await client.ExecuteAsync(request, token).ConfigureAwait(false);
@@ -300,7 +300,7 @@ public class Rest
         foreach (var nameValue in props) {
             if (nameValue.Value == null) throw new Exception("Header value is not permitted to be null");
 
-#if NETCOREAPP
+#if NET6_0_OR_GREATER
             var p = new HeaderParameter(nameValue.Name, nameValue.Value, false);
 #else
             var p = new Parameter(nameValue.Name, nameValue.Value, ParameterType.HttpHeader, false);
@@ -317,7 +317,7 @@ public class Rest
             return;
         }
 
-#if NETCOREAPP
+#if NET6_0_OR_GREATER
         request.AddParameter(new JsonParameter(body, ContentType.Json));
 #else
         request.AddJsonBody(body);
@@ -326,7 +326,7 @@ public class Rest
 
     private static void AddStringBody(RestRequest request, string body, string contentType)
     {
-#if NETCOREAPP
+#if NET6_0_OR_GREATER
         var ct = contentType;
         request.AddStringBody(body, ct);
 #else
@@ -340,7 +340,7 @@ public class Rest
     {
         if (multipart == null) return;
 
-#if NETCOREAPP
+#if NET6_0_OR_GREATER
         foreach (var part in multipart.Parts) {
             if (part is ByteArrayPart bp) {
                 request.AddFile(bp.Name, bp.Bytes, bp.FileName, bp.ContentType);
@@ -390,7 +390,7 @@ public class Rest
 #endif
     }
 
-#if NETCOREAPP
+#if NET6_0_OR_GREATER
     /************ Dispose **********/
     public void Dispose()
     {
