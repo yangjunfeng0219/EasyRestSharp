@@ -12,21 +12,21 @@ using System.Threading;
 using System.Threading.Tasks;
 
 #if NET6_0_OR_GREATER
-public class Rest : IDisposable
+public class EasyRestClient : IDisposable
 #else
-public class Rest
+public class EasyRestClient
 #endif
 {
     private readonly string? baseUrl;
     private readonly RestClient client;
 
-    public Rest(string baseUrl)
+    public EasyRestClient(string baseUrl)
     {
         this.baseUrl = baseUrl;
         client = new RestClient(baseUrl);
     }
 
-    public Rest()
+    public EasyRestClient()
     {
         this.baseUrl = null;
         client = new RestClient();
@@ -61,13 +61,13 @@ public class Rest
         return ExecuteAsync(RestMethod.Post, url, body, headers, authenticator);
     }
 
-    public Task<T> PostMultipartAsync<T>(string url, MultipartData multipart,
+    public Task<T> PostMultipartAsync<T>(string url, RestMultipart multipart,
         object? headers = null, IAuthenticator? authenticator = null)
     {
         return ExecuteWithMultipartAsync<T>(RestMethod.Post, url, multipart, headers, authenticator);
     }
 
-    public Task<RestResponse> PostMultipartAsync(string url, MultipartData multipart,
+    public Task<RestResponse> PostMultipartAsync(string url, RestMultipart multipart,
         object? headers = null, IAuthenticator? authenticator = null)
     {
         return ExecuteWithMultipartAsync(RestMethod.Post, url, multipart, headers, authenticator);
@@ -155,7 +155,7 @@ public class Rest
         return NativeExecuteAsync(request);
     }
 
-    public Task<T> ExecuteWithMultipartAsync<T>(RestMethod method, string url, MultipartData multipart,
+    public Task<T> ExecuteWithMultipartAsync<T>(RestMethod method, string url, RestMultipart multipart,
         object? headers = null, IAuthenticator? authenticator = null)
     {
         var request = new RestRequest(url, ToNativeMethod(method));
@@ -166,7 +166,7 @@ public class Rest
         return NativeExecuteAsync<T>(request);
     }
 
-    public Task<RestResponse> ExecuteWithMultipartAsync(RestMethod method, string url, MultipartData multipart,
+    public Task<RestResponse> ExecuteWithMultipartAsync(RestMethod method, string url, RestMultipart multipart,
         object? headers = null, IAuthenticator? authenticator = null)
     {
         var request = new RestRequest(url, ToNativeMethod(method));
@@ -219,29 +219,6 @@ public class Rest
         return NativeExecuteAsync(request);
     }
 
-#if NET6_0_OR_GREATER
-    public static void ThrowIfError(RestResponse response)
-#else
-    public static void ThrowIfError(IRestResponse response)
-#endif
-    {
-        var exception = response.ResponseStatus switch {
-            ResponseStatus.Aborted => new WebException("Request aborted", response.ErrorException),
-            ResponseStatus.Error => response.ErrorException,
-            ResponseStatus.TimedOut => new TimeoutException("Request timed out", response.ErrorException),
-            ResponseStatus.None => null,
-            ResponseStatus.Completed => null,
-            _ => throw response.ErrorException ?? new ArgumentOutOfRangeException()
-        };
-
-        if (exception != null)
-            throw exception;
-
-        if (!response.IsSuccessful) {
-            throw new Exception($"description:{response.StatusDescription} content:{response.Content}");
-        }
-    }
-
     private Method ToNativeMethod(RestMethod rm)
     {
 #if NET6_0_OR_GREATER
@@ -272,11 +249,18 @@ public class Rest
 #if NET6_0_OR_GREATER
         var response = await client.ExecuteAsync<T>(request).ConfigureAwait(false);
         ThrowIfError(response);
+        if (!response.IsSuccessful) {
+            throw new Exception($"Status code: {response.StatusCode} Description:{response.StatusDescription}");
+        }
+
         return response.Data!;
 #else
         var response = await client.ExecuteAsync<T>(request, token).ConfigureAwait(false);
+        ThrowIfError(response!);
+        if (!response.IsSuccessful) {
+            throw new Exception($"Status code: {response.StatusCode} Description:{response.StatusDescription}");
+        }
         var responseT = response as RestResponse<T> ?? throw new Exception("Invalid response type");
-        ThrowIfError(responseT);
         return responseT.Data!;
 #endif
     }
@@ -284,13 +268,34 @@ public class Rest
     private async Task<RestResponse> NativeExecuteAsync(RestRequest request, CancellationToken token = default)
     {
 #if NET6_0_OR_GREATER
-        return await client.ExecuteAsync(request, token).ConfigureAwait(false);
+        var response = await client.ExecuteAsync(request, token).ConfigureAwait(false);
+        ThrowIfError(response);
+        return response;
 #else
         var response = await client.ExecuteAsync(request, token).ConfigureAwait(false);
+        ThrowIfError(response);
         return response as RestResponse ?? throw new Exception("Invalid response type");
 #endif
     }
 
+#if NET6_0_OR_GREATER
+    private static void ThrowIfError(RestResponse response)
+#else
+    private static void ThrowIfError(IRestResponse response)
+#endif
+    {
+        var exception = response.ResponseStatus switch {
+            ResponseStatus.Aborted => new WebException("Request aborted", response.ErrorException),
+            ResponseStatus.Error => response.ErrorException,
+            ResponseStatus.TimedOut => new TimeoutException("Request timed out", response.ErrorException),
+            ResponseStatus.None => null,
+            ResponseStatus.Completed => null,
+            _ => throw response.ErrorException ?? new ArgumentOutOfRangeException()
+        };
+
+        if (exception != null)
+            throw exception;
+    }
 
     private static void AddHeaders(RestRequest request, object? headers)
     {
@@ -336,41 +341,41 @@ public class Rest
 #endif
     }
 
-    private static void AddMultipartBody(RestRequest request, MultipartData? multipart)
+    private static void AddMultipartBody(RestRequest request, RestMultipart? multipart)
     {
         if (multipart == null) return;
 
 #if NET6_0_OR_GREATER
         foreach (var part in multipart.Parts) {
-            if (part is ByteArrayPart bp) {
+            if (part is RestByteArrayPart bp) {
                 request.AddFile(bp.Name, bp.Bytes, bp.FileName, bp.ContentType);
             }
-            else if (part is StreamPart streamPart) {
+            else if (part is RestStreamPart streamPart) {
                 request.AddFile(streamPart.Name,
                     () => streamPart.Stream,
                     streamPart.FileName,
                     streamPart.ContentType);
             }
-            else if (part is FilePart fp) {
+            else if (part is RestFilePart fp) {
                 request.AddFile(fp.Name, fp.FilePath, fp.ContentType);
             }
-            else if (part is StringPart strPart) {
+            else if (part is RestStringPart strPart) {
                 request.AddParameter(strPart.Name, strPart.Value);
             }
         }
 #else
         foreach (var part in multipart.Parts) {
-            if (part is ByteArrayPart bp) {
+            if (part is RestByteArrayPart bp) {
                 request.AddFileBytes(bp.Name, bp.Bytes, bp.FileName, bp.ContentType ?? RestContentTypes.OctetStream);
             }
-            else if (part is StreamPart streamPart) {
+            else if (part is RestStreamPart streamPart) {
                 request.AddFile(streamPart.Name,
                     new Action<Stream>(s => streamPart.Stream.CopyTo(s)),
                     streamPart.FileName,
                     streamPart.Stream.Length,
                     streamPart.ContentType ?? RestContentTypes.OctetStream);
             }
-            else if (part is FilePart fp) {
+            else if (part is RestFilePart fp) {
                 var fi = new FileInfo(fp.FilePath);
                 request.Files.Add(new FileParameter {
                     Name = fp.Name,
@@ -383,7 +388,7 @@ public class Rest
                     ContentType = fp.ContentType ?? RestContentTypes.OctetStream
                 });
             }
-            else if (part is StringPart strPart) {
+            else if (part is RestStringPart strPart) {
                 request.AddParameter(strPart.Name, strPart.Value!);
             }
         }

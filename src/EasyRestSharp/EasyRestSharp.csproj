@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <Version>0.9.6</Version>
-	  <PackageReleaseNotes>add some usage examples</PackageReleaseNotes>
+	  <Version>0.10.1</Version>
+	  <PackageReleaseNotes>change some class names, not compatible with 0.9.x</PackageReleaseNotes>
 	  <TargetFrameworks>net6.0;net452</TargetFrameworks>
 	<LangVersion>13</LangVersion>
 	  <Nullable>enable</Nullable>
@@ -13,9 +13,8 @@
 	  <![CDATA[
 		  An easy-to-use RESTful or Rest Web API client library based on RestSharp
 		  For example:
-		  using var client = new Rest("https://api.example.com");
-		  var reponse = await client.PostAsync("/Person/Insert", new { name = "John", age = 30 });
-		  Rest.ThrowIfError(response);
+		  using var client = new EasyRestClient("https://api.example.com");
+		  var response = await client.PostAsync("/Person/Insert", new { name = "John", age = 30 });
 		  var person = await client.GetAsync<Person>("/Person/FindByName", new { name = "John" });
 	  ]]>
 		  </Description>

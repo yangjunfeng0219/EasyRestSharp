@@ -18,9 +18,9 @@ public interface IRestFilePart : IRestPart
     string FileName { get; }
 }
 
-public struct StringPart : IRestPart
+public struct RestStringPart : IRestPart
 {
-    public StringPart(string name, string? value)
+    public RestStringPart(string name, string? value)
     {
         Name = name;
         Value = value;
@@ -30,9 +30,9 @@ public struct StringPart : IRestPart
     public string? ContentType => RestContentTypes.PlainText;
 }
 
-public struct ByteArrayPart : IRestFilePart
+public struct RestByteArrayPart : IRestFilePart
 {
-    public ByteArrayPart(string name, byte[] bytes, string fileName, string? contentType = null)
+    public RestByteArrayPart(string name, byte[] bytes, string fileName, string? contentType = null)
     {
         Name = name;
         Bytes = bytes;
@@ -46,9 +46,9 @@ public struct ByteArrayPart : IRestFilePart
     public string? ContentType { get; private set; }
 }
 
-public struct StreamPart : IRestFilePart
+public struct RestStreamPart : IRestFilePart
 {
-    public StreamPart(string name, System.IO.Stream stream, string fileName, string? contentType = null)
+    public RestStreamPart(string name, System.IO.Stream stream, string fileName, string? contentType = null)
     {
         Name = name;
         Stream = stream;
@@ -62,9 +62,9 @@ public struct StreamPart : IRestFilePart
     public string? ContentType { get; private set; }
 }
 
-public struct FilePart : IRestFilePart
+public struct RestFilePart : IRestFilePart
 {
-    public FilePart(string name, string filePath, string fileName, string? contentType = null)
+    public RestFilePart(string name, string filePath, string fileName, string? contentType = null)
     {
         Name = name;
         FilePath = filePath;
@@ -78,9 +78,9 @@ public struct FilePart : IRestFilePart
     public string? ContentType { get; private set; }
 }
 
-public class MultipartData
+public class RestMultipart
 {
-    public MultipartData()
+    public RestMultipart()
     {
         Parts = new List<IRestPart>();
     }
@@ -89,26 +89,26 @@ public class MultipartData
 
     public void AddString(string name, string? value)
     {
-        Parts.Add(new StringPart(name, value));
+        Parts.Add(new RestStringPart(name, value));
     }
 
     public void AddByteArray(string name, byte[] value, string fileName, string? contentType = null)
     {
-        Parts.Add(new ByteArrayPart(name, value, fileName, contentType));
+        Parts.Add(new RestByteArrayPart(name, value, fileName, contentType));
     }
 
     public void AddStream(string name, System.IO.Stream stream, string fileName, string? contentType = null)
     {
-        Parts.Add(new StreamPart(name, stream, fileName, contentType));
+        Parts.Add(new RestStreamPart(name, stream, fileName, contentType));
     }
 
     public void AddFile(string name, string filePath, string fileName, string? contentType = null)
     {
-        Parts.Add(new FilePart(name, filePath, fileName, contentType));
+        Parts.Add(new RestFilePart(name, filePath, fileName, contentType));
     }
 
-    public void AddFile(string name, string filePath, string? contentType = null)
+    public void AddFile(string name, string filePath)
     {
-        Parts.Add(new FilePart(name, filePath, Path.GetFileName(filePath), contentType));
+        Parts.Add(new RestFilePart(name, filePath, Path.GetFileName(filePath), null));
     }
 }
