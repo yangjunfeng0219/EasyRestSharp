@@ -1,2 +1,2 @@
 # EasyRestSharp
-TO SEE new project: MakeEasy.RestClient
+SEE new project: MakeEasy.RestClient
